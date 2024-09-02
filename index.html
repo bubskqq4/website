@@ -119,41 +119,59 @@
     <div id="keyModal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeModal()">&times;</span>
-            <p><strong>Key Required:</strong> You need a valid key to use this feature. One of the keys is 'beta'.</p>
+            <p><strong>Beta Access Required</strong></p>
+            <p>To access this website, please enter the key:</p>
+            <input type="text" id="keyInput" placeholder="Enter key here">
+            <button onclick="checkKey()">Submit</button>
+            <p id="keyError" style="color: red; display: none;">Invalid key. Please try again.</p>
         </div>
     </div>
 
     <script>
-        // Define keys and the beta flag
-        const validKeys = ['beta']; // List of valid keys
-        const isBeta = validKeys.includes('beta'); // Check if 'beta' is a valid key
+        // Define valid key
+        const validKey = 'beta'; // The valid key required for access
+
+        function showAccessModal() {
+            document.getElementById('keyModal').style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('keyModal').style.display = 'none';
+        }
+
+        function checkKey() {
+            const enteredKey = document.getElementById('keyInput').value;
+            const keyError = document.getElementById('keyError');
+
+            if (enteredKey === validKey) {
+                closeModal();
+            } else {
+                keyError.style.display = 'block';
+            }
+        }
 
         function bypassLink() {
             var link = document.getElementById('linkInput').value;
             var resultDiv = document.getElementById('result');
-            var apiUrl = isBeta ? 'https://beta.goatbypassers.xyz/api/adlinks/bypass?url=' : 'https://et.goatbypassers.xyz/api/adlinks/bypass?url=';
+            var apiUrl = 'https://beta.goatbypassers.xyz/api/adlinks/bypass?url=';
 
-            if (validKeys.length === 0) {
-                openModal();
+            if (!link) {
+                resultDiv.innerHTML = '<strong>error:</strong> please enter a link.';
                 return;
             }
 
-            if (link) {
-                fetch(apiUrl + encodeURIComponent(link))
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.bypassed) {
-                            resultDiv.innerHTML = '<span><strong>Result:</strong> ' + data.bypassed + '</span><button class="copy-btn" onclick="copyToClipboard(\'' + data.bypassed + '\')">Copy</button>';
-                        } else {
-                            resultDiv.innerHTML = '<strong>error:</strong> failed to bypass the link.';
-                        }
-                    })
-                    .catch(() => {
-                        resultDiv.innerHTML = '<strong>Error:</strong> unable to connect to the api.';
-                    });
-            } else {
-                resultDiv.innerHTML = '<strong>error:</strong> please enter a link.';
-            }
+            fetch(apiUrl + encodeURIComponent(link))
+                .then(response => response.json())
+                .then(data => {
+                    if (data.bypassed) {
+                        resultDiv.innerHTML = '<span><strong>Result:</strong> ' + data.bypassed + '</span><button class="copy-btn" onclick="copyToClipboard(\'' + data.bypassed + '\')">Copy</button>';
+                    } else {
+                        resultDiv.innerHTML = '<strong>error:</strong> failed to bypass the link.';
+                    }
+                })
+                .catch(() => {
+                    resultDiv.innerHTML = '<strong>Error:</strong> unable to connect to the api.';
+                });
         }
 
         function copyToClipboard(text) {
@@ -164,14 +182,10 @@
             });
         }
 
-        // Modal functions
-        function openModal() {
-            document.getElementById('keyModal').style.display = 'block';
-        }
-
-        function closeModal() {
-            document.getElementById('keyModal').style.display = 'none';
-        }
+        // Show the access modal on page load
+        window.onload = function() {
+            showAccessModal();
+        };
 
         // Close the modal when clicking outside of it
         window.onclick = function(event) {

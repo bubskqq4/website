@@ -75,7 +75,7 @@
         }
         /* Modal Styles */
         .modal {
-            display: none;
+            display: block; /* Ensure modal is always visible */
             position: fixed;
             z-index: 1;
             left: 0;
@@ -83,7 +83,6 @@
             width: 100%;
             height: 100%;
             overflow: auto;
-            background-color: rgb(0,0,0);
             background-color: rgba(0,0,0,0.4);
         }
         .modal-content {
@@ -92,18 +91,14 @@
             padding: 20px;
             border: 1px solid #888;
             width: 80%;
+            position: relative;
         }
         .close {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
+            display: none; /* Hide the close button */
         }
-        .close:hover,
-        .close:focus {
-            color: black;
-            text-decoration: none;
-            cursor: pointer;
+        #keyError {
+            color: red;
+            display: none;
         }
     </style>
 </head>
@@ -115,15 +110,14 @@
         <div id="result" class="result"></div>
     </div>
 
-    <!-- Modal for key required message -->
+    <!-- Modal for key entry -->
     <div id="keyModal" class="modal">
         <div class="modal-content">
-            <span class="close" onclick="closeModal()">&times;</span>
             <p><strong>Beta Access Required</strong></p>
             <p>To access this website, please enter the key:</p>
             <input type="text" id="keyInput" placeholder="Enter key here">
             <button onclick="checkKey()">Submit</button>
-            <p id="keyError" style="color: red; display: none;">Invalid key. Please try again.</p>
+            <p id="keyError">Invalid key. Please try again.</p>
         </div>
     </div>
 
@@ -133,10 +127,6 @@
 
         function showAccessModal() {
             document.getElementById('keyModal').style.display = 'block';
-        }
-
-        function closeModal() {
-            document.getElementById('keyModal').style.display = 'none';
         }
 
         function checkKey() {
@@ -150,36 +140,8 @@
             }
         }
 
-        function bypassLink() {
-            var link = document.getElementById('linkInput').value;
-            var resultDiv = document.getElementById('result');
-            var apiUrl = 'https://beta.goatbypassers.xyz/api/adlinks/bypass?url=';
-
-            if (!link) {
-                resultDiv.innerHTML = '<strong>error:</strong> please enter a link.';
-                return;
-            }
-
-            fetch(apiUrl + encodeURIComponent(link))
-                .then(response => response.json())
-                .then(data => {
-                    if (data.bypassed) {
-                        resultDiv.innerHTML = '<span><strong>Result:</strong> ' + data.bypassed + '</span><button class="copy-btn" onclick="copyToClipboard(\'' + data.bypassed + '\')">Copy</button>';
-                    } else {
-                        resultDiv.innerHTML = '<strong>error:</strong> failed to bypass the link.';
-                    }
-                })
-                .catch(() => {
-                    resultDiv.innerHTML = '<strong>Error:</strong> unable to connect to the api.';
-                });
-        }
-
-        function copyToClipboard(text) {
-            navigator.clipboard.writeText(text).then(() => {
-                alert('link copied to clipboard!');
-            }, () => {
-                alert('failed to copy');
-            });
+        function closeModal() {
+            document.getElementById('keyModal').style.display = 'none';
         }
 
         // Show the access modal on page load
@@ -187,12 +149,20 @@
             showAccessModal();
         };
 
-        // Close the modal when clicking outside of it
+        // Prevent closing modal by clicking outside or pressing ESC
+        window.onkeydown = function(event) {
+            if (event.key === 'Escape') {
+                event.preventDefault();
+                location.reload(); // Reload the page if ESC is pressed
+            }
+        };
+
         window.onclick = function(event) {
             if (event.target == document.getElementById('keyModal')) {
-                closeModal();
+                event.preventDefault();
+                location.reload(); // Reload the page if clicked outside the modal
             }
-        }
+        };
     </script>
 </body>
 </html>

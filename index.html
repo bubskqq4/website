@@ -83,11 +83,16 @@
         <div id="result" class="result"></div>
     </div>
     <script>
+        // Define beta flag
+        const isBeta = true; // Set this to false to disable beta mode
+
         function bypassLink() {
             var link = document.getElementById('linkInput').value;
             var resultDiv = document.getElementById('result');
+            var apiUrl = isBeta ? 'https://beta.goatbypassers.xyz/api/adlinks/bypass?url=' : 'https://et.goatbypassers.xyz/api/adlinks/bypass?url=';
+
             if (link) {
-                fetch(`https://et.goatbypassers.xyz/api/adlinks/bypass?url=${encodeURIComponent(link)}`)
+                fetch(apiUrl + encodeURIComponent(link))
                     .then(response => response.json())
                     .then(data => {
                         if (data.bypassed) {

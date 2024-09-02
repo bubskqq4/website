@@ -73,6 +73,38 @@
         .copy-btn:hover {
             background: #0056b3;
         }
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgb(0,0,0);
+            background-color: rgba(0,0,0,0.4);
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -82,14 +114,29 @@
         <button onclick="bypassLink()">Bypass Link</button>
         <div id="result" class="result"></div>
     </div>
+
+    <!-- Modal for key required message -->
+    <div id="keyModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <p><strong>Key Required:</strong> You need a valid key to use this feature. One of the keys is 'beta'.</p>
+        </div>
+    </div>
+
     <script>
-        // Define beta flag
-        const isBeta = true; // Set this to false to disable beta mode
+        // Define keys and the beta flag
+        const validKeys = ['beta']; // List of valid keys
+        const isBeta = validKeys.includes('beta'); // Check if 'beta' is a valid key
 
         function bypassLink() {
             var link = document.getElementById('linkInput').value;
             var resultDiv = document.getElementById('result');
             var apiUrl = isBeta ? 'https://beta.goatbypassers.xyz/api/adlinks/bypass?url=' : 'https://et.goatbypassers.xyz/api/adlinks/bypass?url=';
+
+            if (validKeys.length === 0) {
+                openModal();
+                return;
+            }
 
             if (link) {
                 fetch(apiUrl + encodeURIComponent(link))
@@ -115,6 +162,22 @@
             }, () => {
                 alert('failed to copy');
             });
+        }
+
+        // Modal functions
+        function openModal() {
+            document.getElementById('keyModal').style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('keyModal').style.display = 'none';
+        }
+
+        // Close the modal when clicking outside of it
+        window.onclick = function(event) {
+            if (event.target == document.getElementById('keyModal')) {
+                closeModal();
+            }
         }
     </script>
 </body>
